@@ -212,76 +212,109 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Healthcare Data Project Specific
-# ================================
+# Healthcare Data Project Specific (Healix)
+# ==========================================
 
-# Database files
+# Database files and outputs
 *.sqlite
 *.db
 *.sqlite3
-db/
-databases/
+db/claims_db.sqlite
+db/*_report.txt
 
-# Data files (keep original for reference but ignore processed)
-data/processed/
-data/interim/
+# Keep structure but ignore sensitive data
+# outputs/ folder structure is kept for reference
 outputs/cleaned/
 outputs/processed/
+outputs/eda/
+outputs/*/
+
+# Data files (keep original healthcare_dataset.csv for reference)
+data/processed/
+data/interim/
 *.csv.bak
 *.xlsx.bak
 
-# Large data files
+# Keep insurance provider data structure but ignore sensitive details
+insurance_providers/sensitive/
+insurance_providers/*_sensitive*
+
+# Large data files and models
 *.parquet
 *.feather
 *.h5
 *.hdf5
-
-# Model files
 models/
 *.pkl
 *.pickle
 *.joblib
 *.model
 
-# Reports and visualizations
+# Jupyter Notebook outputs and checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*.ipynb.bak
+
+# Generated reports and visualizations
 reports/
 figures/
 plots/
+# Keep specific EDA plots for reference, ignore others
+!outputs/eda/*.png
+!outputs/eda/*.csv
 *.png
 *.jpg
 *.jpeg
 *.svg
 *.pdf
 
-# Logs
+# Logs and temporary processing files
 logs/
 *.log
+scrubbing_logs/
+processing_logs/
 
 # Temporary files
 temp/
 tmp/
 *.tmp
 *.temp
+*_temp*
+*_tmp*
 
 # Configuration files with sensitive data
 config/secrets.yml
 config/database.yml
 .env.local
 .env.production
+connection_strings.*
 
-# Patient data (HIPAA compliance)
-# Keep original dataset but ignore any extracted/processed patient data
+# Patient data and PHI (HIPAA compliance)
+# Keep anonymized/synthetic data, ignore real patient data
 patient_data/
 phi_data/
 *_phi_*
-*_patient_*
+*_patient_identifiable*
+*_real_patient*
+
+# Database connection and credential files
+*.connection
+*.credentials
+db_config.*
+database_urls.*
 
 # Backup files
 backup/
 *.backup
 *~
+*.bak
 
-# Compressed files
+# Analysis scratch files
+scratch/
+testing/
+sandbox/
+
+# Large compressed files
 *.zip
 *.tar.gz
 *.rar
@@ -290,3 +323,14 @@ backup/
 # Documentation builds
 docs/build/
 site/
+
+# Healthcare specific formats
+*.hl7
+*.dicom
+*.dcm
+*.cda
+
+# Performance and profiling outputs
+profile_*.txt
+benchmark_*.csv
+performance_*.log

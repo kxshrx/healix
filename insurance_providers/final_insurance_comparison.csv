@@ -1,0 +1,6 @@
+Provider,Plan_Type,Deductible,Coverage,OOP_Max,Max_Annual_Benefit,Pre_Existing_Waiting
+Blue Cross Blue Shield,PPO Standard,"$1,500",80%,"$8,000",Unlimited,No waiting period
+Medicare,Original Medicare (Parts A & B),"$1,676",80%,No limit,Unlimited,No waiting period
+Aetna,Choice POS II Standard,$750,80%,"$6,500",Unlimited,No waiting period
+UnitedHealthcare,Choice Plus PPO Standard,$750,80%,"$6,000",Unlimited,No waiting period
+Cigna,Open Access Plus (OAP) Standard,"$2,500",80%,"$7,000",Unlimited,No waiting period
