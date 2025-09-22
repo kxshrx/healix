@@ -268,6 +268,9 @@ plots/
 *.svg
 *.pdf
 
+# Large CSV files that exceed GitHub limits
+outputs/claims_with_policy_rules.csv
+
 # Logs and temporary processing files
 logs/
 *.log

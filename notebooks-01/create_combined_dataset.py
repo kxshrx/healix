@@ -13,18 +13,25 @@ from pathlib import Path
 
 
 def main():
-    # Database path
-    db_path = "/Users/kxshrx/asylum/healix/db/claims_db.sqlite"
-
+    # Get the project root directory (parent of notebooks-01)
+    project_root = Path(__file__).parent.parent
+    
+    # Database path (in project root/db/)
+    db_path = project_root / "db" / "claims_db.sqlite"
+    
     print("=" * 60)
     print("Task 3: Creating Combined Claims + Policy Dataset")
+    print("=" * 60)
+    print(f"Project root: {project_root}")
+    print(f"Database path: {db_path}")
+    print(f"Database exists: {db_path.exists()}")
     print("=" * 60)
 
     # Step 1: Connect to database and load tables
     print("\nStep 1: Loading data from SQLite database...")
 
     try:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(str(db_path))
 
         # Load claims table
         print("   Loading claims_table...")
@@ -168,10 +175,10 @@ def main():
     print("\nStep 7: Saving to CSV...")
 
     try:
-        csv_path = "/Users/kxshrx/asylum/healix/claims_with_policy_rules.csv"
-
-        # Create outputs directory if it doesn't exist
-        Path(csv_path).parent.mkdir(parents=True, exist_ok=True)
+        # CSV path (in project root/outputs/)
+        outputs_dir = project_root / "outputs"
+        outputs_dir.mkdir(exist_ok=True)
+        csv_path = outputs_dir / "claims_with_policy_rules.csv"
 
         final_df.to_csv(csv_path, index=False)
         print(f"   Successfully saved to: {csv_path}")
