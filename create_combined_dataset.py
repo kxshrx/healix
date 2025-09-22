@@ -20,7 +20,7 @@ def main():
     print("=" * 60)
     
     # Step 1: Connect to database and load tables
-    print("\n📁 Step 1: Loading data from SQLite database...")
+    print("\nStep 1: Loading data from SQLite database...")
     
     try:
         conn = sqlite3.connect(db_path)
@@ -28,19 +28,19 @@ def main():
         # Load claims table
         print("   Loading claims_table...")
         claims_df = pd.read_sql_query("SELECT * FROM claims_table", conn)
-        print(f"   ✓ Loaded {len(claims_df):,} claims")
+        print(f"   Loaded {len(claims_df):,} claims")
         
         # Load policy table  
         print("   Loading policy_table...")
         policy_df = pd.read_sql_query("SELECT * FROM policy_table", conn)
-        print(f"   ✓ Loaded {len(policy_df):,} policies")
+        print(f"   Loaded {len(policy_df):,} policies")
         
     except Exception as e:
-        print(f"❌ Error loading data: {e}")
+        print(f"Error loading data: {e}")
         return
     
     # Step 2: Display table schemas
-    print("\n📋 Step 2: Table Schemas")
+    print("\nStep 2: Table Schemas")
     print("\nClaims Table Schema:")
     print(claims_df.dtypes)
     print(f"\nClaims Table Shape: {claims_df.shape}")
@@ -50,7 +50,7 @@ def main():
     print(f"\nPolicy Table Shape: {policy_df.shape}")
     
     # Step 3: Check join compatibility
-    print("\n🔗 Step 3: Checking join compatibility...")
+    print("\nStep 3: Checking join compatibility...")
     
     claims_providers = set(claims_df['insurance_provider'].unique())
     policy_providers = set(policy_df['provider_name'].unique())
@@ -62,7 +62,7 @@ def main():
     print(f"   Policies without claims: {sorted(policy_providers - claims_providers)}")
     
     # Step 4: Merge claims with policies
-    print("\n🔄 Step 4: Merging claims with policies...")
+    print("\nStep 4: Merging claims with policies...")
     
     # Perform left join to keep all claims
     combined_df = claims_df.merge(
@@ -72,18 +72,18 @@ def main():
         how='left'
     )
     
-    print(f"   ✓ Created combined dataset with {len(combined_df):,} rows")
-    print(f"   ✓ Combined dataset has {len(combined_df.columns)} columns")
+    print(f"   Created combined dataset with {len(combined_df):,} rows")
+    print(f"   Combined dataset has {len(combined_df.columns)} columns")
     
     # Check for any claims without matching policies
     no_policy_match = combined_df['provider_id'].isna().sum()
     if no_policy_match > 0:
-        print(f"   ⚠️  Warning: {no_policy_match} claims have no matching policy")
+        print(f"   Warning: {no_policy_match} claims have no matching policy")
     else:
-        print("   ✓ All claims have matching policies")
+        print("   All claims have matching policies")
     
     # Step 5: Prepare final dataset
-    print("\n📊 Step 5: Preparing final dataset...")
+    print("\nStep 5: Preparing final dataset...")
     
     # Select and rename columns as specified in requirements
     final_columns = [
@@ -108,15 +108,15 @@ def main():
     # Add a policy_id column for easier reference (same as provider_id)
     final_df['policy_id'] = final_df['provider_id']
     
-    print(f"   ✓ Final dataset shape: {final_df.shape}")
+    print(f"   Final dataset shape: {final_df.shape}")
     
     # Step 6: Save to SQLite as new table
-    print("\n💾 Step 6: Saving combined table to SQLite...")
+    print("\nStep 6: Saving combined table to SQLite...")
     
     try:
         # Save as new table (will overwrite if exists)
         final_df.to_sql('claims_with_policy_rules', conn, if_exists='replace', index=False)
-        print("   ✓ Successfully created 'claims_with_policy_rules' table")
+        print("   Successfully created 'claims_with_policy_rules' table")
         
         # Create indexes for better performance
         cursor = conn.cursor()
@@ -127,14 +127,14 @@ def main():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_combined_billing_amount ON claims_with_policy_rules(billing_amount)")
         
         conn.commit()
-        print("   ✓ Created performance indexes")
+        print("   Created performance indexes")
         
     except Exception as e:
-        print(f"   ❌ Error saving to SQLite: {e}")
+        print(f"   Error saving to SQLite: {e}")
         return
     
     # Step 7: Save to CSV
-    print("\n💾 Step 7: Saving to CSV...")
+    print("\nStep 7: Saving to CSV...")
     
     try:
         csv_path = "/Users/kxshrx/asylum/healix/claims_with_policy_rules.csv"
@@ -143,17 +143,17 @@ def main():
         Path(csv_path).parent.mkdir(parents=True, exist_ok=True)
         
         final_df.to_csv(csv_path, index=False)
-        print(f"   ✓ Successfully saved to: {csv_path}")
+        print(f"   Successfully saved to: {csv_path}")
         
     except Exception as e:
-        print(f"   ❌ Error saving to CSV: {e}")
+        print(f"   Error saving to CSV: {e}")
     
     # Step 8: Validation and Summary
-    print("\n📈 Step 8: Validation and Summary")
+    print("\nStep 8: Validation and Summary")
     print("=" * 40)
     
     # Show schema of new table
-    print("\n🏗️  Schema of 'claims_with_policy_rules' table:")
+    print("\nSchema of 'claims_with_policy_rules' table:")
     try:
         schema_query = """
         SELECT sql FROM sqlite_master 
@@ -173,7 +173,7 @@ def main():
         print(f"Error getting schema: {e}")
     
     # Show sample data
-    print(f"\n📋 First 5 rows of combined dataset:")
+    print(f"\nFirst 5 rows of combined dataset:")
     try:
         sample_data = pd.read_sql_query("SELECT * FROM claims_with_policy_rules LIMIT 5", conn)
         print(sample_data.to_string())
@@ -181,7 +181,7 @@ def main():
         print(f"Error displaying sample data: {e}")
     
     # Summary statistics
-    print(f"\n📊 Summary Statistics:")
+    print(f"\nSummary Statistics:")
     
     try:
         # Claims per provider
@@ -198,7 +198,7 @@ def main():
             ORDER BY claim_count DESC
         """, conn)
         
-        print("\n📈 Claims by Provider and Plan Type:")
+        print("\nClaims by Provider and Plan Type:")
         print(provider_stats.to_string(index=False))
         
         # Average claim amount by plan type
@@ -214,7 +214,7 @@ def main():
             ORDER BY avg_claim_amount DESC
         """, conn)
         
-        print("\n📈 Summary by Plan Type:")
+        print("\nSummary by Plan Type:")
         print(plan_stats.to_string(index=False))
         
         # Overall summary
@@ -222,7 +222,7 @@ def main():
         total_amount = final_df['billing_amount'].sum()
         avg_amount = final_df['billing_amount'].mean()
         
-        print(f"\n📊 Overall Summary:")
+        print(f"\nOverall Summary:")
         print(f"   Total Claims: {total_claims:,}")
         print(f"   Total Billing Amount: ${total_amount:,.2f}")
         print(f"   Average Claim Amount: ${avg_amount:,.2f}")
@@ -236,9 +236,9 @@ def main():
     conn.close()
     
     print("\n" + "=" * 60)
-    print("✅ Task 3 completed successfully!")
-    print("✅ Created 'claims_with_policy_rules' table in SQLite")
-    print("✅ Exported combined dataset to CSV")
+    print("Task 3 completed successfully!")
+    print("Created 'claims_with_policy_rules' table in SQLite")
+    print("Exported combined dataset to CSV")
     print("=" * 60)
 
 if __name__ == "__main__":
