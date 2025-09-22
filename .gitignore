@@ -222,12 +222,8 @@ $RECYCLE.BIN/
 db/claims_db.sqlite
 db/*_report.txt
 
-# Keep structure but ignore sensitive data
-# outputs/ folder structure is kept for reference
-outputs/cleaned/
-outputs/processed/
-outputs/eda/
-outputs/*/
+# Exclude entire outputs directory - all generated files
+outputs/
 
 # Data files (keep original healthcare_dataset.csv for reference)
 data/processed/
@@ -259,17 +255,11 @@ models/
 reports/
 figures/
 plots/
-# Keep specific EDA plots for reference, ignore others
-!outputs/eda/*.png
-!outputs/eda/*.csv
 *.png
 *.jpg
 *.jpeg
 *.svg
 *.pdf
-
-# Large CSV files that exceed GitHub limits
-outputs/claims_with_policy_rules.csv
 
 # Logs and temporary processing files
 logs/
