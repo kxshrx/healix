@@ -223,7 +223,7 @@ db/claims_db.sqlite
 db/*_report.txt
 
 # Exclude entire outputs directory - all generated files
-outputs/
+# outputs/
 
 # Data files (keep original healthcare_dataset.csv for reference)
 data/processed/

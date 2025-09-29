@@ -1,0 +1,82 @@
+
+HEALTHCARE CLAIMS DATABASE INGESTION REPORT
+==========================================
+Generated: 2025-09-29 16:13:54
+
+DATABASE INFORMATION:
+- Database Name: db.sqlite
+- Database Location: /Users/kxshrx/asylum/healix/db.sqlite
+- Database Size: 14.30 MB
+- Schema Version: 7-column structure (v2.0)
+
+SOURCE DATA:
+- Source File: post-eda.csv
+- Records in Source: 55500
+- Processing Time: 1.09 seconds
+
+INGESTION RESULTS:
+- Records Successfully Processed: 55500
+- Records Inserted to Database: 55500
+- Data Integrity Check: PASSED
+- Processing Errors: 0
+
+DATABASE SCHEMA:
+Table: healthcare_claims
+- claim_id (PRIMARY KEY)
+- age (INTEGER, 0-120)
+- gender (TEXT, Male/Female) 
+- medical_condition (TEXT)
+- admission_type (TEXT, Emergency/Elective/Urgent)
+- insurance_provider (TEXT)
+- billing_amount (DECIMAL)
+- length_of_stay_days (INTEGER)
+- created_at (TIMESTAMP)
+
+INDEXES CREATED: 11
+- Performance optimization indexes for all key columns
+- Composite indexes for common query patterns
+
+DATA QUALITY SUMMARY:
+- Unique Insurance Providers: 5
+- Unique Medical Conditions: 6  
+- Age Range: 13-89 years
+- Billing Amount Range: $9.24 - $52,764.28
+- Length of Stay Range: 1-30 days
+
+QUICK ACCESS:
+- Database: /Users/kxshrx/asylum/healix/db.sqlite
+- Connect: sqlite3 /Users/kxshrx/asylum/healix/db.sqlite
+
+NEXT STEPS:
+1. Use the database for analytics and machine learning
+2. Connect to BI tools for visualization
+3. Run queries for business insights
+4. Backup database regularly
+
+SAMPLE QUERIES:
+-- Provider analysis
+SELECT insurance_provider, COUNT(*), AVG(billing_amount) 
+FROM healthcare_claims 
+GROUP BY insurance_provider;
+
+-- Condition trends  
+SELECT medical_condition, AVG(length_of_stay_days), AVG(billing_amount)
+FROM healthcare_claims 
+GROUP BY medical_condition
+ORDER BY AVG(billing_amount) DESC;
+
+-- Age demographics
+SELECT 
+    CASE 
+        WHEN age < 30 THEN 'Under 30'
+        WHEN age < 50 THEN '30-49' 
+        WHEN age < 70 THEN '50-69'
+        ELSE '70+'
+    END as age_group,
+    COUNT(*) as patients,
+    AVG(billing_amount) as avg_cost
+FROM healthcare_claims 
+GROUP BY age_group;
+
+DATABASE STATUS: READY FOR ANALYTICS
+=====================================
