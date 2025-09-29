@@ -75,12 +75,16 @@ def main():
         # Create final dataset
         print(f"\n💾 Saving merged dataset...")
         
+        # Remove created_at column if it exists
+        columns_to_exclude = ['created_at']
+        final_df = merged_df.drop(columns=[col for col in columns_to_exclude if col in merged_df.columns])
+        
         # Generate timestamp for unique naming
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Save to database
         table_name = "merged_claims_policies"
-        merged_df.to_sql(table_name, conn, if_exists="replace", index=False)
+        final_df.to_sql(table_name, conn, if_exists="replace", index=False)
         
         # Create indexes for performance
         cursor = conn.cursor()
@@ -100,21 +104,21 @@ def main():
         # Save to CSV
         csv_filename = f"merged_claims_policies_{timestamp}.csv"
         csv_path = outputs_dir / csv_filename
-        merged_df.to_csv(csv_path, index=False)
+        final_df.to_csv(csv_path, index=False)
         
         file_size_mb = csv_path.stat().st_size / (1024 * 1024)
         print(f"   ✅ CSV file: {csv_filename} ({file_size_mb:.1f} MB)")
         
         # Generate summary
         print(f"\n📈 Dataset Summary:")
-        print(f"   Total Claims: {len(merged_df):,}")
-        print(f"   Total Billing: ${merged_df['billing_amount'].sum():,.2f}")
-        print(f"   Average Claim: ${merged_df['billing_amount'].mean():,.2f}")
-        print(f"   Insurance Providers: {merged_df['insurance_provider'].nunique()}")
-        print(f"   Plan Types: {merged_df['plan_type'].nunique()}")
+        print(f"   Total Claims: {len(final_df):,}")
+        print(f"   Total Billing: ${final_df['billing_amount'].sum():,.2f}")
+        print(f"   Average Claim: ${final_df['billing_amount'].mean():,.2f}")
+        print(f"   Insurance Providers: {final_df['insurance_provider'].nunique()}")
+        print(f"   Plan Types: {final_df['plan_type'].nunique()}")
         
         # Top providers by volume
-        provider_stats = merged_df.groupby('insurance_provider').agg({
+        provider_stats = final_df.groupby('insurance_provider').agg({
             'claim_id': 'count',
             'billing_amount': 'mean'
         }).round(2)
