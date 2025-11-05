@@ -215,19 +215,13 @@ $RECYCLE.BIN/
 # Healthcare Data Project Specific (Healix)
 # ==========================================
 
-# Database files and outputs
+# Database files and temporary reports
 *.sqlite
 *.db
-*.sqlite3
-db/claims_db.sqlite
-db/*_report.txt
+db.sqlite
+db_ingestion_report_*.txt
 
-# Exclude entire outputs directory - all generated files
-# outputs/
-
-# Data files (keep original healthcare_dataset.csv for reference)
-data/processed/
-data/interim/
+# Temporary CSV outputs (keep processed datasets needed for app)
 *.csv.bak
 *.xlsx.bak
 
@@ -235,31 +229,42 @@ data/interim/
 insurance_providers/sensitive/
 insurance_providers/*_sensitive*
 
-# Large data files and models
-*.parquet
-*.feather
-*.h5
-*.hdf5
-models/
-*.pkl
-*.pickle
-*.joblib
-*.model
+# Compressed data files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Temporary test/verification scripts
+verify_project.py
+test_*.py
+scratch_*.py
+
+# Large model files (>100MB) - use Git LFS or external storage
+ml_models/trained_models/all_trained_models.pkl
+ml_models/trained_models/best_regression_model.pkl
+ml_models/trained_models/processed_data.pkl
+
+# Keep only essential small model files:
+# - best_classification_model.pkl (1.6KB)
+# - feature_metadata.pkl (634B)
+# - label_encoders.pkl (2.4KB)
 
 # Jupyter Notebook outputs and checkpoints
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 *.ipynb.bak
 
-# Generated reports and visualizations
+# Generated reports and visualizations (except system architecture diagram)
 reports/
 figures/
 plots/
 *.png
+!system_architecture.png
 *.jpg
 *.jpeg
 *.svg
-*.pdf
+# *.pdf  # Uncomment if you want to exclude PDFs
 
 # Logs and temporary processing files
 logs/
@@ -306,12 +311,6 @@ backup/
 scratch/
 testing/
 sandbox/
-
-# Large compressed files
-*.zip
-*.tar.gz
-*.rar
-*.7z
 
 # Documentation builds
 docs/build/

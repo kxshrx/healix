@@ -1,0 +1,29 @@
+MEDICAL CLAIM FORM
+================================================================
+
+PATIENT INFORMATION
+Name: John Smith
+Age: 45
+Gender: Male
+Date of Birth: 05/15/1980
+
+DIAGNOSIS
+Primary Diagnosis: Type 2 Diabetes
+ICD-10 Code: E11.9
+
+ADMISSION DETAILS
+Admission Type: Emergency
+Admission Date: 10/15/2025
+Discharge Date: 10/18/2025
+Length of Stay: 3 days
+
+INSURANCE INFORMATION
+Insurance Provider: Blue Cross
+Policy Number: BC123456789
+Group Number: GRP-001
+
+BILLING DETAILS
+Total Charges: $15,000.00
+Procedure Codes: 99285, 82947, 85025
+
+================================================================

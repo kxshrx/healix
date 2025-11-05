@@ -1,0 +1,5 @@
+Model,Train Accuracy,Val Accuracy,Precision,Recall,F1 Score,Training Time (s)
+Logistic Regression,1.0,1.0,1.0,1.0,1.0,0.3865511417388916
+Decision Tree,1.0,1.0,1.0,1.0,1.0,0.02280116081237793
+Random Forest,1.0,1.0,1.0,1.0,1.0,0.27538633346557617
+Gradient Boosting,1.0,1.0,1.0,1.0,1.0,1.4356350898742676
