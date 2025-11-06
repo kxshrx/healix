@@ -62,13 +62,13 @@ with col1:
     )
     
     length_of_stay = st.number_input(
-        "Length of Stay (days)",
-        min_value=0,
-        max_value=365,
-        value=3,
-        step=1,
-        help="Number of days in hospital"
-    )
+                "Length of Stay (days)",
+                min_value=0,
+                max_value=365,
+                value=0,
+                key="length_of_stay",
+                help="0 days = Outpatient visit. Note: Elective outpatient procedures are typically not covered."
+            )
 
 with col2:
     st.subheader("Insurance & Billing")
@@ -90,6 +90,14 @@ with col2:
     )
     
     st.markdown("---")
+    
+    # Real-time validation warning
+    if admission_type == "Elective" and length_of_stay == 0:
+        st.error("❌ **Coverage Alert:** Elective outpatient procedures (0-day stay) are typically NOT covered by insurance. Consider inpatient admission for coverage eligibility.")
+    elif length_of_stay == 0 and admission_type == "Urgent":
+        st.warning("⚠️ **Coverage Notice:** Urgent outpatient visits may have limited coverage. Emergency room visits are more likely to be covered.")
+    
+    st.markdown("---")
     st.markdown("### Summary")
     
     st.info(f"""
@@ -107,28 +115,74 @@ col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
     if st.button("Predict Coverage", type="primary", use_container_width=True):
-        claim_data = {
-            'age': age,
-            'gender': gender,
-            'medical_condition': medical_condition,
-            'admission_type': admission_type,
-            'insurance_provider': insurance_provider,
-            'billing_amount': billing_amount,
-            'length_of_stay_days': length_of_stay
-        }
-        
-        is_valid, errors = ClaimValidator.validate_claim(claim_data)
-        
-        if is_valid:
-            with st.spinner("Making prediction..."):
-                predictor = ClaimPredictor()
-                result = predictor.predict(claim_data)
-                st.session_state.prediction_result = result
-                st.success("Prediction complete! Results displayed below.")
+        # Edge case validation: Outpatient elective/urgent procedures
+        if length_of_stay == 0 and admission_type in ["Elective", "Urgent"]:
+            st.error(f"""
+            ❌ **Coverage Denied**
+            
+            {admission_type} outpatient procedures (0-day stay) are **NOT COVERED** by insurance.
+            
+            **Recommendation:** Procedures must require inpatient admission (≥1 day stay) for coverage eligibility.
+            """)
+            
+            # Store denial result without ML prediction
+            st.session_state.prediction_result = {
+                'is_covered': False,
+                'confidence': 100.0,
+                'predicted_amount': 0.0,
+                'breakdown': {
+                    'billing_amount': billing_amount,
+                    'deductible': 0.0,
+                    'copay': 0.0,
+                    'covered_amount': 0.0,
+                    'out_of_pocket': billing_amount
+                },
+                'policy_details': {
+                    'plan_type': 'Standard',
+                    'coverage_percentage': 0,
+                    'deductible_amount': 0,
+                    'copay_percentage': 0,
+                    'diagnostic_test_coverage': 0,
+                    'preventive_care_coverage': 0
+                },
+                'claim_data': {
+                    'age': age,
+                    'gender': gender,
+                    'medical_condition': medical_condition,
+                    'admission_type': admission_type,
+                    'insurance_provider': insurance_provider,
+                    'billing_amount': billing_amount,
+                    'length_of_stay_days': length_of_stay
+                },
+                'warnings': [
+                    f"{admission_type} outpatient procedures (0-day stay) are not covered by insurance.",
+                    "This is a business rule applied before ML prediction to handle edge cases."
+                ]
+            }
         else:
-            st.error("Validation failed:")
-            for error in errors:
-                st.error(f"- {error}")
+            # Normal prediction flow
+            claim_data = {
+                'age': age,
+                'gender': gender,
+                'medical_condition': medical_condition,
+                'admission_type': admission_type,
+                'insurance_provider': insurance_provider,
+                'billing_amount': billing_amount,
+                'length_of_stay_days': length_of_stay
+            }
+            
+            is_valid, errors = ClaimValidator.validate_claim(claim_data)
+            
+            if is_valid:
+                with st.spinner("Making prediction..."):
+                    predictor = ClaimPredictor()
+                    result = predictor.predict(claim_data)
+                    st.session_state.prediction_result = result
+                    st.success("Prediction complete! Results displayed below.")
+            else:
+                st.error("Validation failed:")
+                for error in errors:
+                    st.error(f"- {error}")
 
 st.markdown("---")
 

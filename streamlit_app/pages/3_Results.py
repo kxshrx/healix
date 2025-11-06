@@ -32,6 +32,12 @@ claim = result['claim_data']
 
 st.header("Coverage Decision")
 
+# Display warnings if any
+if 'warnings' in result and result['warnings']:
+    for warning in result['warnings']:
+        st.warning(f"⚠️ {warning}")
+    st.markdown("---")
+
 col1, col2, col3 = st.columns([2, 2, 2])
 
 with col1:

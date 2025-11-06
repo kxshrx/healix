@@ -172,20 +172,57 @@ with col2:
         }
         
         if st.button("Predict Coverage", type="primary"):
-            validator = ClaimValidator()
-            is_valid, errors = validator.validate_claim(claim_data)
-            
-            if not is_valid:
-                st.error("Invalid claim data:")
-                for error in errors:
-                    st.write(f"- {error}")
+            # Edge case validation: Outpatient elective/urgent procedures
+            if length_of_stay == 0 and admission_type in ["Elective", "Urgent"]:
+                st.error(f"""
+                ❌ **Coverage Denied**
+                
+                {admission_type} outpatient procedures (0-day stay) are **NOT COVERED** by insurance.
+                
+                **Recommendation:** Procedures must require inpatient admission (≥1 day stay) for coverage eligibility.
+                """)
+                
+                # Store denial result without ML prediction
+                st.session_state.prediction_result = {
+                    'is_covered': False,
+                    'confidence': 100.0,
+                    'predicted_amount': 0.0,
+                    'breakdown': {
+                        'billing_amount': billing_amount,
+                        'deductible': 0.0,
+                        'copay': 0.0,
+                        'covered_amount': 0.0,
+                        'out_of_pocket': billing_amount
+                    },
+                    'policy_details': {
+                        'plan_type': 'Standard',
+                        'coverage_percentage': 0,
+                        'deductible_amount': 0,
+                        'copay_percentage': 0,
+                        'diagnostic_test_coverage': 0,
+                        'preventive_care_coverage': 0
+                    },
+                    'claim_data': claim_data,
+                    'warnings': [
+                        f"{admission_type} outpatient procedures (0-day stay) are not covered by insurance.",
+                        "This is a business rule applied before ML prediction to handle edge cases."
+                    ]
+                }
             else:
-                with st.spinner("Analyzing claim..."):
-                    predictor = ClaimPredictor()
-                    result = predictor.predict(claim_data)
-                    st.session_state.prediction_result = result
-                    
-                st.success("Prediction complete! Results displayed below.")
+                validator = ClaimValidator()
+                is_valid, errors = validator.validate_claim(claim_data)
+                
+                if not is_valid:
+                    st.error("Invalid claim data:")
+                    for error in errors:
+                        st.write(f"- {error}")
+                else:
+                    with st.spinner("Analyzing claim..."):
+                        predictor = ClaimPredictor()
+                        result = predictor.predict(claim_data)
+                        st.session_state.prediction_result = result
+                        
+                    st.success("Prediction complete! Results displayed below.")
     else:
         st.info("Upload a PDF and extract information to see the form here.")
 

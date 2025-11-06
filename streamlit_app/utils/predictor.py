@@ -26,17 +26,62 @@ class ClaimPredictor:
         coverage_pct = policy_details['coverage_percentage'] / 100
         copay_pct = policy_details['copay_percentage'] / 100
         
-        after_deductible = max(0, billing_amount - deductible)
-        covered_by_insurance = after_deductible * coverage_pct
-        copay_amount = covered_by_insurance * copay_pct
-        final_covered = covered_by_insurance * (1 - copay_pct)
-        out_of_pocket = billing_amount - final_covered
+        # Real-world insurance rules
+        MIN_CLAIM_AMOUNT = 100.0  # Minimum amount for insurance to process
+        
+        # Rule 1: Claims below minimum threshold - patient pays full amount
+        if billing_amount < MIN_CLAIM_AMOUNT:
+            return {
+                'billing_amount': round(billing_amount, 2),
+                'deductible': 0.0,
+                'copay': 0.0,
+                'covered_amount': 0.0,
+                'out_of_pocket': round(billing_amount, 2)
+            }
+        
+        # Rule 2: If deductible exceeds billing, patient pays only the billing amount
+        # The applied deductible reduces their annual deductible balance
+        if deductible >= billing_amount:
+            return {
+                'billing_amount': round(billing_amount, 2),
+                'deductible': round(billing_amount, 2),  # Applied deductible (reduces annual limit)
+                'copay': 0.0,
+                'covered_amount': 0.0,
+                'out_of_pocket': round(billing_amount, 2)
+            }
+        
+        # Rule 3: Normal calculation - deductible applied first, then coinsurance split
+        after_deductible = billing_amount - deductible
+        
+        # Insurance covers their percentage of the remaining amount
+        insurance_covered = after_deductible * coverage_pct
+        
+        # Patient pays copay/coinsurance percentage of the remaining amount
+        patient_copay = after_deductible * copay_pct
+        
+        # Rule 4: Sanity check - total should equal billing amount
+        # Total = deductible + insurance_covered + patient_copay should equal billing_amount
+        total_calculated = deductible + insurance_covered + patient_copay
+        
+        # Handle rounding errors
+        if abs(total_calculated - billing_amount) > 0.02:
+            # Adjust insurance covered to make it balance
+            insurance_covered = billing_amount - deductible - patient_copay
+        
+        # Total out of pocket = deductible + copay
+        out_of_pocket = deductible + patient_copay
+        
+        # Rule 5: Out of pocket cannot exceed billing amount
+        out_of_pocket = min(out_of_pocket, billing_amount)
+        
+        # Rule 6: Insurance covered cannot be negative
+        insurance_covered = max(0.0, insurance_covered)
         
         return {
             'billing_amount': round(billing_amount, 2),
             'deductible': round(deductible, 2),
-            'copay': round(copay_amount, 2),
-            'covered_amount': round(predicted_amount, 2),
+            'copay': round(patient_copay, 2),
+            'covered_amount': round(insurance_covered, 2),
             'out_of_pocket': round(out_of_pocket, 2)
         }
     
@@ -48,6 +93,8 @@ class ClaimPredictor:
         
         is_covered = bool(coverage_prediction)
         confidence = float(coverage_probability[int(coverage_prediction)])
+        
+        warnings = []
         
         if is_covered:
             amount_prediction = self.regression_model.predict(X)[0]
@@ -64,11 +111,12 @@ class ClaimPredictor:
         
         result = {
             'is_covered': is_covered,
-            'confidence': round(confidence * 100, 2),
+            'confidence': round(confidence * 100, 2) if confidence <= 1 else confidence,
             'predicted_amount': predicted_amount,
             'breakdown': breakdown,
             'policy_details': policy_details,
-            'claim_data': claim_data
+            'claim_data': claim_data,
+            'warnings': warnings
         }
         
         return result
