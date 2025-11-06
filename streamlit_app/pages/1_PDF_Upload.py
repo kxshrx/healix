@@ -162,13 +162,13 @@ with col2:
         st.markdown("---")
         
         claim_data = {
-            'Age': age,
-            'Gender': gender,
-            'Medical_Condition': medical_condition,
-            'Admission_Type': admission_type,
-            'Insurance_Provider': insurance_provider,
-            'Billing_Amount': billing_amount,
-            'Length_of_Stay_Days': length_of_stay
+            'age': age,
+            'gender': gender,
+            'medical_condition': medical_condition,
+            'admission_type': admission_type,
+            'insurance_provider': insurance_provider,
+            'billing_amount': billing_amount,
+            'length_of_stay_days': length_of_stay
         }
         
         if st.button("Predict Coverage", type="primary"):

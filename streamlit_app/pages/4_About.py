@@ -14,8 +14,8 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Healix - Complete Project Documentation")
-st.markdown("### *Data Science Assignment: Healthcare Claim Coverage Prediction System*")
+st.title("Healix - Documentation")
+st.markdown("### *Healthcare Claim Coverage Prediction System*")
 st.markdown("---")
 
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
