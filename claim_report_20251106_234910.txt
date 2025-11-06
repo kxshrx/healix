@@ -1,0 +1,31 @@
+
+HEALTHCARE CLAIM COVERAGE REPORT
+================================
+
+Claim Information:
+- Patient Age: 30 years
+- Gender: Male
+- Medical Condition: Asthma
+- Admission Type: Emergency
+- Length of Stay: N/A days
+- Billing Amount: $8,500.00
+
+Coverage Decision:
+- Status: COVERED
+- Confidence: 100.0%
+
+Insurance Policy:
+- Provider: UnitedHealthcare
+- Plan Type: Choice Plus PPO Standard
+- Coverage Percentage: 80%
+- Deductible: $750.00
+- Copay: 20%
+
+Cost Breakdown:
+- Total Billing: $8,500.00
+- Deductible: $750.00
+- Copay: $1,550.00
+- Insurance Covered: $6,200.00
+- Out of Pocket: $2,300.00
+
+Report Generated: 2025-11-06 23:49:10

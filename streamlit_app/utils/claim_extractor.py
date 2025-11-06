@@ -1,5 +1,11 @@
+"""
+Claim Data Extractor
+Extracts structured claim information from text with PHI scrubbing
+"""
+
 import re
 from typing import Dict, Any, Optional
+from .phi_scrubber import PHIScrubber
 
 
 class ClaimExtractor:
@@ -18,6 +24,8 @@ class ClaimExtractor:
     ADMISSION_TYPES = ['Emergency', 'Urgent', 'Elective']
     
     def __init__(self):
+        """Initialize the claim extractor with PHI scrubber."""
+        self.phi_scrubber = PHIScrubber()
         self.extraction_patterns = {
             'age': [
                 r'Age[:\s]+(\d+)',
@@ -160,16 +168,40 @@ class ClaimExtractor:
         return round(confidence, 2)
     
     def extract_claim_info(self, text: str) -> Dict[str, Any]:
-        extracted_data = {
-            'age': self.extract_age(text),
-            'gender': self.extract_gender(text),
-            'medical_condition': self.extract_medical_condition(text),
-            'admission_type': self.extract_admission_type(text),
-            'insurance_provider': self.extract_insurance_provider(text),
-            'billing_amount': self.extract_billing_amount(text),
-            'length_of_stay_days': self.extract_length_of_stay(text)
-        }
+        """
+        Extract claim information from text with PHI scrubbing.
+        This is the main method to call.
         
+        Args:
+            text: Raw text from PDF or manual input
+            
+        Returns:
+            Dictionary with medical data only (no PHI)
+        """
+        # Scrub PHI first
+        scrubbed_text = self.phi_scrubber.scrub_identifiers(text)
+        scrubbed_text = self.phi_scrubber.scrub_hospital_names(scrubbed_text)
+        
+        # Extract medical data using PHI scrubber's method
+        extracted_data = self.phi_scrubber.extract_medical_data_only(scrubbed_text)
+        
+        # Fallback to individual extractors if needed
+        if not extracted_data['age']:
+            extracted_data['age'] = self.extract_age(scrubbed_text)
+        if not extracted_data['gender']:
+            extracted_data['gender'] = self.extract_gender(scrubbed_text)
+        if not extracted_data['medical_condition']:
+            extracted_data['medical_condition'] = self.extract_medical_condition(scrubbed_text)
+        if not extracted_data['admission_type']:
+            extracted_data['admission_type'] = self.extract_admission_type(scrubbed_text)
+        if not extracted_data['insurance_provider']:
+            extracted_data['insurance_provider'] = self.extract_insurance_provider(scrubbed_text)
+        if not extracted_data['billing_amount']:
+            extracted_data['billing_amount'] = self.extract_billing_amount(scrubbed_text)
+        if not extracted_data['length_of_stay_days']:
+            extracted_data['length_of_stay_days'] = self.extract_length_of_stay(scrubbed_text)
+        
+        # Calculate confidence
         extracted_data['confidence'] = self.calculate_confidence(extracted_data)
         
         return extracted_data

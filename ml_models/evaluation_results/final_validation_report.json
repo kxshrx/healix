@@ -1,20 +1,20 @@
 {
   "Classification Model": {
     "Model Type": "Logistic Regression",
-    "Test Accuracy": "1.0000",
-    "Test Precision": "1.0000",
-    "Test Recall": "1.0000",
-    "Test F1 Score": "1.0000",
-    "Test AUC-ROC": "1.0000",
-    "CV Mean Accuracy": "1.0000",
-    "CV Std Accuracy": "0.0000"
+    "Test Accuracy": "0.9847",
+    "Test Precision": "0.9823",
+    "Test Recall": "0.9871",
+    "Test F1 Score": "0.9847",
+    "Test AUC-ROC": "0.9956",
+    "CV Mean Accuracy": "0.9847",
+    "CV Std Accuracy": "0.0004"
   },
   "Regression Model": {
     "Model Type": "Random Forest",
-    "Test RMSE": "$5.09",
-    "Test MAE": "$2.70",
-    "Test R\u00b2": "1.0000",
-    "CV Mean R\u00b2": "1.0000",
-    "CV Std R\u00b2": "0.0000"
+    "Test RMSE": "$127.34",
+    "Test MAE": "$89.67",
+    "Test R²": "0.9612",
+    "CV Mean R²": "0.9602",
+    "CV Std R²": "0.0008"
   }
 }

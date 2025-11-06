@@ -51,15 +51,36 @@ with col1:
                     
                     # Show available methods
                     deps = parser.check_dependencies()
-                    st.info(f"Available extraction methods: PyPDF2={deps['PyPDF2']}, pdfplumber={deps['pdfplumber']}, OCR={deps['OCR']}")
+                    available_methods = []
+                    if deps['PyPDF2']:
+                        available_methods.append("PyPDF2")
+                    if deps['pdfplumber']:
+                        available_methods.append("pdfplumber")
+                    if deps['OCR']:
+                        available_methods.append("OCR (Tesseract)")
+                    
+                    if available_methods:
+                        st.info(f"📋 Available extraction methods: {', '.join(available_methods)}")
+                    else:
+                        st.error("⚠️ No PDF extraction libraries available! Please install PyPDF2 or pdfplumber.")
                     
                     text, method = parser.extract_text(uploaded_file)
                     
                     if text and len(text.strip()) > 0:
-                        st.success(f"✓ Text extracted successfully using {method} ({len(text)} characters)")
+                        st.success(f"✓ Text extracted successfully using {method}")
+                        st.info(f"📊 Extracted {len(text)} characters (PHI scrubbed)")
                         
-                        with st.expander("View Extracted Text", expanded=False):
-                            st.text_area("Raw Text", text, height=200, key="raw_text")
+                        # Display the extracted and scrubbed text
+                        with st.expander("📄 View Extracted Text (PHI Scrubbed)", expanded=True):
+                            st.markdown("**Raw text after PHI scrubbing:**")
+                            st.text_area(
+                                "Extracted Content",
+                                text,
+                                height=300,
+                                key="extracted_scrubbed_text",
+                                help="This text has been automatically scrubbed to remove Protected Health Information (PHI)"
+                            )
+                            st.caption("⚠️ All personally identifiable information has been redacted from the text above.")
                         
                         with st.spinner("Parsing claim information..."):
                             extractor = ClaimExtractor()
@@ -73,24 +94,80 @@ with col1:
                                 st.success(f"✓ Information extracted with {extracted_data['confidence']:.1f}% confidence")
                     else:
                         st.error("❌ Failed to extract text from PDF.")
+                        
+                        # Parse the method string to extract errors
+                        method_parts = method.split("Failed (")
+                        has_errors = len(method_parts) > 1
+                        
+                        if has_errors and "poppler" in method.lower():
+                            st.error("🔧 **Poppler is not installed or not in PATH!**")
+                            st.info("""
+                            **To fix this on macOS:**
+                            ```bash
+                            brew install poppler
+                            ```
+                            
+                            **On Linux (Ubuntu/Debian):**
+                            ```bash
+                            sudo apt-get install poppler-utils
+                            ```
+                            
+                            After installation, restart the Streamlit app.
+                            """)
+                        elif has_errors and "tesseract" in method.lower():
+                            st.error("🔧 **Tesseract OCR is not installed!**")
+                            st.info("""
+                            **To fix this on macOS:**
+                            ```bash
+                            brew install tesseract
+                            ```
+                            
+                            **On Linux (Ubuntu/Debian):**
+                            ```bash
+                            sudo apt-get install tesseract-ocr
+                            ```
+                            
+                            After installation, restart the Streamlit app.
+                            """)
+                        
                         st.warning("""
                         **Possible reasons:**
-                        - PDF might be an image/scanned document (OCR required)
+                        - PDF might be an image/scanned document (requires OCR)
                         - PDF might be encrypted or password-protected
-                        - PDF might have special formatting
+                        - PDF might have special formatting or be corrupted
                         
                         **Try these solutions:**
-                        1. Use the "Manual Entry" page instead
-                        2. Convert the PDF to a text-based format
-                        3. Ensure the PDF is not password-protected
+                        1. Install OCR support (see instructions above)
+                        2. Use the "Manual Entry" page instead
+                        3. Convert the PDF to a text-based format
+                        4. Ensure the PDF is not password-protected
                         """)
                         
-                        # Show extracted text even if empty for debugging
-                        with st.expander("Debug Info"):
-                            st.write(f"Extracted text length: {len(text) if text else 0}")
-                            st.write(f"Method used: {method if method else 'None'}")
+                        # Show debug info
+                        with st.expander("🔧 Debug Information", expanded=True):
+                            st.write(f"**Extracted text length:** {len(text) if text else 0} characters")
+                            st.write(f"**Method used:** {method}")
+                            st.write(f"**Available methods:** {', '.join(available_methods) if available_methods else 'None'}")
+                            
+                            # Show detailed error messages
+                            if has_errors:
+                                error_details = method_parts[1].rstrip(")")
+                                st.error(f"**Detailed errors:**")
+                                for error in error_details.split(", "):
+                                    st.write(f"  • {error}")
+                            
                             if text:
-                                st.text_area("Text content:", text, height=100)
+                                st.text_area("Text content (if any):", text, height=150)
+                            
+                            # Show system check
+                            st.markdown("**System Check:**")
+                            st.write(f"  • PyPDF2: {'✅ Installed' if deps['PyPDF2'] else '❌ Not installed'}")
+                            st.write(f"  • pdfplumber: {'✅ Installed' if deps['pdfplumber'] else '❌ Not installed'}")
+                            st.write(f"  • OCR Libraries: {'✅ Installed' if deps['OCR'] else '❌ Not installed'}")
+                            
+                            if deps['OCR']:
+                                st.info("💡 OCR libraries are installed but system dependencies might be missing.")
+                                st.code("# Check if poppler is installed:\nwhich pdftoimage\n\n# Check if tesseract is installed:\nwhich tesseract", language="bash")
                 
                 except Exception as e:
                     st.error(f"❌ Error processing PDF: {str(e)}")

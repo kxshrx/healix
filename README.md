@@ -504,4 +504,3 @@ Complete documentation is available in the application:
 
 **Built with ❤️ using Streamlit and scikit-learn**
 
-*Last Updated: November 6, 2025*

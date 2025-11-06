@@ -1,0 +1,31 @@
+
+HEALTHCARE CLAIM COVERAGE REPORT
+================================
+
+Claim Information:
+- Patient Age: 60 years
+- Gender: Male
+- Medical Condition: Diabetes
+- Admission Type: Urgent
+- Length of Stay: N/A days
+- Billing Amount: $18,500.00
+
+Coverage Decision:
+- Status: COVERED
+- Confidence: 100.0%
+
+Insurance Policy:
+- Provider: Medicare
+- Plan Type: Original Medicare (Parts A & B)
+- Coverage Percentage: 80%
+- Deductible: $1,676.00
+- Copay: 20%
+
+Cost Breakdown:
+- Total Billing: $18,500.00
+- Deductible: $1,676.00
+- Copay: $3,364.80
+- Insurance Covered: $13,459.20
+- Out of Pocket: $5,040.80
+
+Report Generated: 2025-11-06 23:47:04
