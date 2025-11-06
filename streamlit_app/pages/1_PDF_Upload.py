@@ -46,23 +46,59 @@ with col1:
         
         if st.button("Extract Information", type="primary"):
             with st.spinner("Extracting text from PDF..."):
-                parser = PDFParser()
-                text, method = parser.extract_text(uploaded_file)
-                
-                if text:
-                    st.success(f"Text extracted successfully using {method}")
+                try:
+                    parser = PDFParser()
                     
-                    with st.expander("View Extracted Text"):
-                        st.text_area("Raw Text", text, height=200)
+                    # Show available methods
+                    deps = parser.check_dependencies()
+                    st.info(f"Available extraction methods: PyPDF2={deps['PyPDF2']}, pdfplumber={deps['pdfplumber']}, OCR={deps['OCR']}")
                     
-                    with st.spinner("Parsing claim information..."):
-                        extractor = ClaimExtractor()
-                        extracted_data = extractor.extract_claim_info(text)
-                        st.session_state.extracted_data = extracted_data
+                    text, method = parser.extract_text(uploaded_file)
+                    
+                    if text and len(text.strip()) > 0:
+                        st.success(f"✓ Text extracted successfully using {method} ({len(text)} characters)")
                         
-                        st.success(f"Information extracted with {extracted_data['confidence']:.1f}% confidence")
-                else:
-                    st.error("Failed to extract text from PDF. Please try manual entry.")
+                        with st.expander("View Extracted Text", expanded=False):
+                            st.text_area("Raw Text", text, height=200, key="raw_text")
+                        
+                        with st.spinner("Parsing claim information..."):
+                            extractor = ClaimExtractor()
+                            extracted_data = extractor.extract_claim_info(text)
+                            st.session_state.extracted_data = extracted_data
+                            
+                            if extracted_data['confidence'] < 50:
+                                st.warning(f"⚠ Information extracted with low confidence: {extracted_data['confidence']:.1f}%")
+                                st.info("Please review and correct the information below before prediction.")
+                            else:
+                                st.success(f"✓ Information extracted with {extracted_data['confidence']:.1f}% confidence")
+                    else:
+                        st.error("❌ Failed to extract text from PDF.")
+                        st.warning("""
+                        **Possible reasons:**
+                        - PDF might be an image/scanned document (OCR required)
+                        - PDF might be encrypted or password-protected
+                        - PDF might have special formatting
+                        
+                        **Try these solutions:**
+                        1. Use the "Manual Entry" page instead
+                        2. Convert the PDF to a text-based format
+                        3. Ensure the PDF is not password-protected
+                        """)
+                        
+                        # Show extracted text even if empty for debugging
+                        with st.expander("Debug Info"):
+                            st.write(f"Extracted text length: {len(text) if text else 0}")
+                            st.write(f"Method used: {method if method else 'None'}")
+                            if text:
+                                st.text_area("Text content:", text, height=100)
+                
+                except Exception as e:
+                    st.error(f"❌ Error processing PDF: {str(e)}")
+                    st.warning("Please try the 'Manual Entry' page or check if your PDF is corrupted.")
+                    
+                    with st.expander("Error Details"):
+                        st.code(str(e))
+
 
 with col2:
     st.header("Step 2: Verify Information")

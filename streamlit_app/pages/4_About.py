@@ -222,33 +222,6 @@ print(merged_df['Coverage_Percentage']
     .value_counts())
         """, language="python")
     
-    st.markdown("---")
-    
-    st.markdown("""
-    <h3 style='color: #1f77b4;'>Merge Results</h3>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric("Original Claims", "55,500")
-        st.metric("Original Policies", "5")
-    
-    with col2:
-        st.metric("Merged Records", "55,500")
-        st.metric("Total Features", "27")
-    
-    with col3:
-        st.metric("Match Rate", "100%")
-        st.metric("Missing Values", "0")
-    
-    st.success("""
-    **Merge Successful**: All 55,500 claims successfully matched with corresponding policy details.
-    
-    The merged dataset now contains comprehensive information including patient demographics, medical conditions,
-    admission details, billing amounts, and complete policy coverage information for accurate prediction modeling.
-    """)
-
 with tab3:
     st.header("Exploratory Data Analysis (EDA)")
     
@@ -400,14 +373,6 @@ with tab3:
         - Decision: Retained (legitimate elderly patients)
         """)
     
-    st.success("""
-    **EDA Conclusions**:
-    - Data quality is excellent (no missing values, no invalid entries)
-    - Feature relationships support predictive modeling
-    - Clear patterns identified for feature engineering
-    - No data transformations needed (distributions acceptable)
-    - Ready for feature engineering and model development
-    """)
 
 with tab4:
     st.header("Feature Engineering")
@@ -957,14 +922,7 @@ joblib.dump(encoders,
 
 print("Models saved successfully!")
     """, language="python")
-    
-    st.success("""
-    **Models Ready for Deployment**:
-    - Classification model saved with 100% test accuracy
-    - Regression model saved with $5.09 RMSE
-    - All encoders saved for consistent preprocessing
-    - Models versioned and ready for production use
-    """)
+
 
 with tab6:
     st.header("Model Validation")
@@ -1155,15 +1113,6 @@ print(f"Std: ${cv_scores.std():.2f}")
         - Documentation complete
         """)
     
-    st.success("""
-    **Validation Summary**:
-    
-    Both models have been thoroughly validated and meet all requirements for production deployment. 
-    The classification model achieves perfect accuracy on the test set, while the regression model 
-    maintains an average error of only $5.09, which is well within acceptable business tolerances.
-    
-    The models are ready for integration into the Streamlit interface.
-    """)
 
 with tab7:
     st.header("User Interface & PDF Processing")
@@ -1245,18 +1194,18 @@ class PDFParser:
 class ClaimExtractor:
     PATTERNS = {
         'age': [
-            r'Age[:\s]+(\d+)',
-            r'(\d+)\s*years?\s*old',
-            r'Patient age[:\s]+(\d+)'
+            r'Age[:\\s]+(\d+)',
+            r'(\d+)\\s*years?\\s*old',
+            r'Patient age[:\\s]+(\d+)'
         ],
         'billing_amount': [
-            r'Total\s*Charges?[:\s]*\$\s*([\d,]+\.?\d*)',
-            r'Amount[:\s]*\$\s*([\d,]+\.?\d*)',
-            r'Bill[:\s]*\$\s*([\d,]+\.?\d*)'
+            r'Total\\s*Charges?[:\\s]*\\$\\s*([\\d,]+\\.?\\d*)',
+            r'Amount[:\\s]*\\$\\s*([\\d,]+\\.?\\d*)',
+            r'Bill[:\\s]*\\$\\s*([\\d,]+\\.?\\d*)'
         ],
         'medical_condition': [
-            r'Diagnosis[:\s]+(Cancer|Diabetes|...)',
-            r'Condition[:\s]+(Cancer|Diabetes|...)',
+            r'Diagnosis[:\\s]+(Cancer|Diabetes|...)',
+            r'Condition[:\\s]+(Cancer|Diabetes|...)',
         ],
         # ... more patterns
     }
@@ -1476,21 +1425,6 @@ class ClaimPredictor:
         Multi-page app with clean navigation.
         """)
     
-    st.success("""
-    **Application Features Summary**:
-    - PDF upload and automatic extraction
-    - Manual entry with validation
-    - Real-time predictions (<1 second)
-    - Interactive visualizations
-    - Downloadable reports
-    - Comprehensive documentation
-    - Professional, polished UI
-    - Mobile-responsive design
-    - Error handling and validation
-    - Session state management
-    
-    The application is production-ready and deployed at: **http://localhost:8501**
-    """)
 
 with tab8:
     st.header("System Architecture")
